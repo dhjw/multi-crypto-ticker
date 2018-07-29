@@ -5,9 +5,7 @@ function afterDOMLoaded(){
 		if(all_coins.length>0){
 			document.body.innerHTML+='<div id="note">(From Top 100 at <a target="_blank" href="https://coinmarketcap.com">CoinMarketCap</a>)</div>\n<div id="cols"></div>\n';
 			for(let i=0;i<all_coins.length;i++) document.getElementById('cols').innerHTML+='<input type="checkbox" id="'+all_coins[i][0]+'"'+(coins.indexOf(all_coins[i][0])!==-1?' checked':'')+'>'+all_coins[i][0]+(all_coins[i][2].toLowerCase()!==all_coins[i][0].toLowerCase()?' - '+all_coins[i][2]:'')+'<br>';
-			// for(let i=0;i<all_coins.length;i++) document.getElementById('cols').innerHTML+='<input type="checkbox" id="'+all_coins[i][0]+'"'+(coins.indexOf(all_coins[i][0])!==-1?' checked':'')+'>'+all_coins[i][0]+' - '+all_coins[i][2]+'<br>';
 			document.body.innerHTML+='<div id="selects"><a id="unsel" href="javascript:;">Unselect All</a></div>';
-			// document.body.innerHTML+='<button id="r_btn">Refresh ticker</button>';
 		} else {
 			document.body.innerHTML+='<div id="note">Error getting coins from API, this should be temporary</div>';
 		}
@@ -25,11 +23,9 @@ function afterDOMLoaded(){
 			for(let i=0;i<all_coins.length;i++) document.getElementById(all_coins[i][0]).addEventListener('click',()=>{ saveCoins(); });
 			document.getElementById('unsel').addEventListener('click',function(){ desel(); });
 		}
-		// document.getElementById('r_btn').addEventListener('click',()=>{ update(); });
 		document.getElementById('freq').addEventListener('change',()=>{ saveFreq(); });
 		document.getElementById('bcol').addEventListener('keyup',()=>{ changeBcol(); });
 		document.getElementById('bcol').addEventListener('change',()=>{ changeBcol(); });
-		// document.getElementById('bc_btn').addEventListener('click',()=>{ saveBcol(); });
 	});
 }
 
@@ -52,24 +48,16 @@ function saveFreq(){
 	localStorage.setItem('freq',document.getElementById('freq').value);
 }
 
-function saveBcol(){
+function changeBcol(){
+	if(debug) console.log('changeBcol()');
 	var bcol=document.getElementById('bcol').value.replace('#','').trim();
 	if(!bcol || !/[a-f\d]{6}/i.test(bcol)){
 		bcol='228822';
 		document.getElementById('bcol').style.background='pink';
-		document.getElementById('bcol').focus();
 	} else {
 		document.getElementById('bcol').style.background='none';
 		document.getElementById('bcol').value=bcol;
-		chrome.browserAction.setBadgeBackgroundColor({color:'#'+bcol});
 	}
-	localStorage.setItem('bcol',bcol);
-}
-
-function changeBcol(){
-	if(debug) console.log('changeBcol()');
-	var bcol=document.getElementById('bcol').value.replace('#','').trim();
-	if(!bcol || !/[a-f\d]{6}/i.test(bcol)) bcol='228822';
 	chrome.browserAction.setBadgeBackgroundColor({color:'#'+bcol});
-	saveBcol();
+	localStorage.setItem('bcol',bcol);
 }
