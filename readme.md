@@ -21,7 +21,6 @@ All prices are obtained from the public CoinMarketCap API
 ### Donations
 BTC: 3LMSJ7w12Fj8VnN9ZBGDVVc1RJxR6dAWpn ([QR code](http://chart.apis.google.com/chart?chs=300x300&cht=qr&choe=ISO-8859-1&chl=3LMSJ7w12Fj8VnN9ZBGDVVc1RJxR6dAWpn))\
 BCH: qpsh5g2f9wk3tjwkl9yhqnw7rhwwuy38dywm7xxcra ([QR code](http://chart.apis.google.com/chart?chs=300x300&cht=qr&choe=ISO-8859-1&chl=bitcoincash:qpsh5g2f9wk3tjwkl9yhqnw7rhwwuy38dywm7xxcra))\
-ETH: 1207970a46a7a76715cd1bd9926ba358822338ed ([QR code](http://chart.apis.google.com/chart?chs=300x300&cht=qr&choe=ISO-8859-1&chl=1207970a46a7a76715cd1bd9926ba358822338ed))\
-LTC: LduZTGT49zynDYNZwdcZACPpPXhLuyGSFR ([QR code](http://chart.apis.google.com/chart?chs=300x300&cht=qr&choe=ISO-8859-1&chl=LduZTGT49zynDYNZwdcZACPpPXhLuyGSFR))
+ETH: 1207970a46a7a76715cd1bd9926ba358822338ed ([QR code](http://chart.apis.google.com/chart?chs=300x300&cht=qr&choe=ISO-8859-1&chl=1207970a46a7a76715cd1bd9926ba358822338ed))
 
 Thank you!
