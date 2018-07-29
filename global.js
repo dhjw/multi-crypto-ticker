@@ -67,7 +67,7 @@ function processData(){
 				b=b.toString().substr(1);
 			} /*else if(a<=9.994){ // 2 decimals
 				var b=a.toFixed(2);
-			} else */if(a<=99.994){ // 2 decimals
+			}*/ else if(a<=99.994){ // 2 decimals
 				var b=a.toFixed(2);
 			} else if(a<=999.94){ // 1 decimal
 				var b=+a.toFixed(1);
