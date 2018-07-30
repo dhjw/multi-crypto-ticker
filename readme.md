@@ -1,5 +1,5 @@
 ## Multi Crypto Ticker (Chrome Extension)
-Watch multiple cryptocurrency prices from your browser toolbar. Choose from the top 100 coins on CoinMarketCap.
+Watch multiple cryptocurrency prices from your browser toolbar. Choose from the top 500 coins on CoinMarketCap.
 
 ### Install
 - [Get it on the Chrome web store](https://chrome.google.com/webstore/detail/mckpoliiiknakdcaoabkkdbbenopnabl)

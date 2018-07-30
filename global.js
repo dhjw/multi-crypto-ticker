@@ -1,5 +1,30 @@
 var debug='', all_coins=[], coins=[];
 
+// multi sync ajax https://stackoverflow.com/a/34570288
+function requestsAreComplete(requests) {
+    return requests.every(function (request) {
+        return request.readyState == 4;
+    });
+}
+
+function unsuccessfulRequests(requests) {
+    var unsuccessful = requests.filter(function (request) {
+         return request.status != 200;
+    });
+    return unsuccessful.length ? unsuccessful : null;
+}
+
+function onRequestsComplete(requests, callback) {
+    function sharedCallback() {
+        if (requestsAreComplete(requests)) {
+            callback(requests, unsuccessfulRequests(requests));
+        }
+    }
+    requests.forEach(function (request) {
+        request.onreadystatechange = sharedCallback;
+    });
+}
+
 function loadEnabledCoins(){
 	coins=localStorage.getItem('enabled_coins');
 	try { coins=JSON.parse(coins); } catch(e){}
@@ -10,7 +35,7 @@ function loadEnabledCoins(){
 function updateBadge(p){
 	if(debug) console.log('updateBadge()');
 	var t='';
-	for(let i=0;i<coins.length;i++) t+=coins[i].toUpperCase()+': '+p[coins[i]]+'\n';
+	for(let i=0;i<coins.length;i++) if(p[coins[i]]) t+=coins[i].toUpperCase()+': '+p[coins[i]]+'\n';
 	chrome.browserAction.setTitle({title:t});
 	var bcol=localStorage.getItem('bcol');
 	if(!bcol || !/[a-f\d]{6}/i.test(bcol)) bcol=228822;
@@ -26,31 +51,49 @@ function update(refresh){
 }
 
 function getData(callback){
-	var x=new XMLHttpRequest();
-	x.timeout=15000;
-	x.open('GET','https://api.coinmarketcap.com/v2/ticker/');
-	x.onreadystatechange=function(){
-		if(x.readyState==4){
-			if(x.status==200){
-				if(debug) console.log('x=',x);
-				try { var r=JSON.parse(x.responseText); } catch(e){}
-				if(debug) console.log('r=',r);
-				if(!r) return;
-				all_coins=[];
-				for(var i in r.data) all_coins.push([r.data[i].symbol,parseFloat(r.data[i].quotes.USD.price),r.data[i].name]);
-				all_coins.sort(sort2D);
-			} else {
-				console.log('api error x=',x);
+	if(debug) console.log('getData()');
+	var num=localStorage.getItem('num');
+	if(!num) num=100;
+	var pages=Math.round(num/100);
+	if(debug) console.log('num='+num+' pages='+pages);
+	var xs=[];
+	for(let i=1;i<=pages;i++){
+		if(i===pages && (i*100)-num>0) var limit=50; else var limit=100;
+		var x=new XMLHttpRequest();
+		x.timeout=15000;
+		x.open('GET','https://api.coinmarketcap.com/v2/ticker/?start='+((i*100)-99)+'&limit='+limit);
+		xs.push(x);
+	}
+	onRequestsComplete(xs,function(xr,xerr){
+		for(let i=0;i<xs.length;i++){
+			if(xs[i].status!==200){
+				console.log('api error ['+i+'] xs=',xs);
 				var t='Error, this should be temporary';
-				if(x.status===429) t+='\n(429) Rate limit exceeded';
+				if(xs[i].status===429) t+='\n(429) Rate limit exceeded';
 				chrome.browserAction.setTitle({title:t});
 				chrome.browserAction.setBadgeBackgroundColor({color:'#AA0000'});
 				chrome.browserAction.setBadgeText({text:'!'});
+				return;
 			}
-			return callback();
 		}
-	}
-	x.send();
+		if(debug) console.log('xs=',xs);
+		var r={data:{}}
+		for(let i=0;i<xs.length;i++){
+			try { var x=JSON.parse(xs[i].responseText); } catch(e){}
+			if(!x) return;
+			for(var j in x.data) r.data[j]=x.data[j];
+		}
+		if(debug) console.log('r=',r);
+		var done=[]; all_coins=[];
+		for(var i in r.data){
+			if(done.indexOf(r.data[i].id)!==-1) continue;
+			done.push(r.data[i].id);
+			all_coins.push([r.data[i].symbol,parseFloat(r.data[i].quotes.USD.price),r.data[i].name]);
+		}
+		all_coins.sort(sort2D);
+		return callback();
+	});
+	for(let i=0;i<xs.length;i++) xs[i].send();
 }
 
 function processData(){
@@ -100,10 +143,11 @@ function makeIcon(t){
 	var img=document.createElement('canvas');
 	img.width=128, img.height=128;
 	var ctx=img.getContext('2d');
-	if(t.length===3) var fs=74; else var fs=54;
+	if(t.length<=3) var fs=74; else var fs=54;
 	ctx.font=fs+'px monospace';//sans-serif';
 	ctx.textBaseline='top';
-	if(t.length===3) ctx.fillText(t,0,0); else ctx.fillText(t,0,10);
+	ctx.textAlign='center';
+	if(t.length<=3) ctx.fillText(t,64,0); else ctx.fillText(t,64,10);
 	return ctx.getImageData(0,0,128,128);
 }
 
