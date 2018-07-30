@@ -62,7 +62,7 @@ function processData(){
 		var s=all_coins[i][0],a=all_coins[i][1],d='';
 		if(coins.indexOf(s)!==-1){
 			if(debug) console.log('found in coins');
-			if(a<=1){ // 4 decimals, no leading 0
+			if(a<=0.99994){ // 4 decimals, no leading 0
 				var d=5, b=+a.toFixed(4);
 				b=b.toString().substr(1);
 			} /*else if(a<=9.994){ // 2 decimals
