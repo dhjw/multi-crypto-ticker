@@ -1,6 +1,5 @@
 var debug='', all_coins=[], coins=[];
 
-
 function loadEnabledCoins(){
 	coins=localStorage.getItem('enabled_coins');
 	try { coins=JSON.parse(coins); } catch(e){}
@@ -37,8 +36,8 @@ function getData(callback){
 				try { var r=JSON.parse(x.responseText); } catch(e){}
 				if(debug) console.log('r=',r);
 				if(!r) return;
-				var done=[]; all_coins=[];
-				for(var i in r.data){ if(done.indexOf(r.data[i].symbol)!==-1) continue; all_coins.push([r.data[i].symbol,parseFloat(r.data[i].quotes.USD.price),r.data[i].name]); }
+				all_coins=[];
+				for(var i in r.data) all_coins.push([r.data[i].symbol,parseFloat(r.data[i].quotes.USD.price),r.data[i].name]);
 				all_coins.sort(sort2D);
 			} else {
 				console.log('api error x=',x);
@@ -65,9 +64,7 @@ function processData(){
 			if(a<=0.99994){ // 4 decimals, no leading 0
 				var d=5, b=+a.toFixed(4);
 				b=b.toString().substr(1);
-			} /*else if(a<=9.994){ // 2 decimals
-				var b=a.toFixed(2);
-			}*/ else if(a<=99.994){ // 2 decimals
+			} else if(a<=99.994){ // 2 decimals
 				var b=a.toFixed(2);
 			} else if(a<=999.94){ // 1 decimal
 				var b=+a.toFixed(1);
@@ -75,11 +72,11 @@ function processData(){
 				b=Math.round(a);
 			} else if(a<=999400){ // 10k-999k, 0 or 1 decimal
 				var b=a/1000;
-				if(b<=99) b=+b.toFixed(1); else b=Math.round(b);
+				if(b<=99.94) b=+b.toFixed(1); else b=Math.round(b);
 				b+='k';
 			} else { // millions
 				var b=a/1000000;
-				if(b<=99) b=+b.toFixed(1); else b=Math.round(b);
+				if(b<=99.94) b=+b.toFixed(1); else b=Math.round(b);
 				b+='M';
 			}
 			if(d) p[s]=+a.toFixed(d); else p[s]=a.toFixed(2); // title
