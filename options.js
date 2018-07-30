@@ -17,7 +17,7 @@ function afterDOMLoaded(){
 		// badge colour
 		var bcol=localStorage.getItem('bcol');
 		if(!bcol || !/[a-f\d]{6}/i.test(bcol)) bcol=228822;
-		document.body.innerHTML+='<h2>Badge Color</h2>#<input type="text" id="bcol" size="6" value="'+bcol+'"><!--<button id="bc_btn">Set</button>--> <a target="_blank" href="https://htmlcolorcodes.com/color-chart/">Chart</a><br><br>';
+		document.body.innerHTML+='<h2>Badge Color</h2>#<input type="text" id="bcol" size="6" value="'+bcol+'"> <a target="_blank" href="https://htmlcolorcodes.com/color-chart/">Chart</a><br><br>';
 		// events
 		if(all_coins.length>0){
 			for(let i=0;i<all_coins.length;i++) document.getElementById(all_coins[i][0]).addEventListener('click',()=>{ saveCoins(); });
