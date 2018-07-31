@@ -143,7 +143,7 @@ function makeIcon(t){
 	var img=document.createElement('canvas');
 	img.width=128, img.height=128;
 	var ctx=img.getContext('2d');
-	if(t.length<=3) var fs=74; else var fs=54;
+	if(t.length<=3) var fs=74; else { t=t.substr(0,4); var fs=54; }
 	ctx.font=fs+'px monospace';//sans-serif';
 	ctx.textBaseline='top';
 	ctx.textAlign='center';
