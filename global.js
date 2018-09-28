@@ -1,5 +1,7 @@
 var debug='', all_coins=[], coins=[];
 
+BigNumber.config({ ROUNDING_MODE:1 });
+
 // multi sync ajax https://stackoverflow.com/a/34570288
 function requestsAreComplete(requests) {
     return requests.every(function (request) {
@@ -101,26 +103,47 @@ function processData(){
 	if(!all_coins) return;
 	var p={};
 	for(let i=0;i<all_coins.length;i++){
-		var s=all_coins[i][0],a=all_coins[i][1],d='';
+		var s=all_coins[i][0],a=BigNumber(all_coins[i][1]),d='';
 		if(coins.indexOf(s)!==-1){
 			if(debug) console.log('found in coins');
-			if(a<=0.99994){ // 4 decimals, no leading 0
-				var d=5, b=+a.toFixed(4);
-				b=b.toString().substr(1);
-			} else if(a<=99.994){ // 2 decimals
-				var b=a.toFixed(2);
-			} else if(a<=999.94){ // 1 decimal
-				var b=+a.toFixed(1);
-			} else if(Math.round(a)<=9999){ // no decimals
-				b=Math.round(a);
-			} else if(a<=999400){ // 10k-999k, 0 or 1 decimal
-				var b=a/1000;
-				if(b<=99.94) b=+b.toFixed(1); else b=Math.round(b);
-				b+='k';
-			} else { // millions
-				var b=a/1000000;
-				if(b<=99.94) b=+b.toFixed(1); else b=Math.round(b);
-				b+='M';
+			// linux 5 char badge
+			if(navigator.platform.indexOf('Linux')!=-1){
+				if(a.toFixed(4)<=0.9999){ // 4 decimals, no leading or trailing 0
+					var d=5, b=+a.toFixed(4);
+					b=b.toString().substr(1);
+				} else if(a.toFixed(2)<=99.99){ // 2 decimals
+					var b=a.toFixed(2);
+				} else if(a.toFixed(1)<=999.9){ // 1 decimal
+					var b=+a.toFixed(1);
+				} else if(a.toFixed(0)<=9999){ // no decimals
+					var b=a.toFixed(0);
+				} else if(a.toFixed(0)<=999999){ // 10k-999k, 0 or 1 decimal
+					var b=a.div(1000);
+					if(BigNumber(b).toFixed(1)<=99.9) b=+BigNumber(b).toFixed(1); else b=BigNumber(b).toFixed(0);
+					b+='k';
+				} else { // millions
+					var b=a.div(1000000);
+					if(BigNumber(b).toFixed(1)<=9.9) b=+BigNumber(b).toFixed(1); else b=BigNumber(b).toFixed(0); // 5 chars cuts off
+					b+='m';
+				}
+			// windows & mac 4 char badge
+			} else {
+ 				if(a.toFixed(3)<=0.999){ // 3 decimals, no leading or trailing 0
+					var d=5, b=+a.toFixed(3);
+					b=b.toString().substr(1);
+				} else if(a.toFixed(2)<=9.99){ // 2 decimals
+					var b=a.toFixed(2);
+				} else if(a.toFixed(1)<=99.9){ // 1 decimal
+					var b=a.toFixed(1);
+				} else if(a.toFixed(0)<=9999){ // no decimals
+					var b=a.toFixed(0);
+				} else if(a.toFixed(0)<=999999){ // 10k-999k, no decimal
+					var b=a.div(1000).toFixed(0)+'k';
+				} else { // millions
+					var b=a.div(1000000);
+					if(BigNumber(b).toFixed(1)<=9.9) b=+BigNumber(b).toFixed(1); else b=BigNumber(b).toFixed(0);
+					b+='M';
+				}
 			}
 			if(d) p[s]=+a.toFixed(d); else p[s]=a.toFixed(2); // title
 			if(typeof b!=='string') b=b.toString();

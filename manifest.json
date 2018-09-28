@@ -2,7 +2,7 @@
 	"name": "Multi Crypto Ticker",
 	"description": "Watch multiple cryptocurrency prices from your browser toolbar",
 	"manifest_version": 2,
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"icons": {
 		"128": "img/default.png"
 	},
@@ -16,7 +16,7 @@
 	},
 	"options_page": "options.html",
 	"background": {
-		"scripts": ["global.js","event.js"],
+		"scripts": ["bignumber.min.js","global.js","event.js"],
 		"persistent": false
 	}
 }
