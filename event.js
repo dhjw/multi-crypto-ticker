@@ -4,6 +4,11 @@ chrome.runtime.onInstalled.addListener(function(details){
 		var freq=localStorage.getItem('freq');
 		if(!freq || freq<5) localStorage.setItem('freq',5);
 	}
+	update(1);
+});
+
+chrome.runtime.onStartup.addListener(function(details){
+	update(1);
 });
 
 chrome.alarms.get('update',a=>{
@@ -16,7 +21,6 @@ chrome.alarms.get('update',a=>{
 		chrome.alarms.create('update',{periodInMinutes:parseInt(freq)});
 		if(debug) setTimeout(()=>{ chrome.alarms.getAll(function(a){ console.log('alarms='); console.log(a); }); },1000);
 	}
-	update(1);
 });
 
 chrome.alarms.onAlarm.addListener(()=>{
