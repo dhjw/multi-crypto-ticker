@@ -41,7 +41,6 @@ chrome.contextMenus.onClicked.addListener((info,tab)=>{
 
 // listen
 chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
-	if(message.stars) stars=message.stars;
 	if(message.pollFresh) sendResponse(fresh);
 });
 

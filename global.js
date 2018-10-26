@@ -1,4 +1,4 @@
-var debug, sandbox, apikey, all_coins=[], coins=[], stars=[], fresh=[];
+var debug, sandbox, apikey, all_coins=[], coins=[], fresh=[];
 
 BigNumber.config({ ROUNDING_MODE:1 });
 
@@ -25,10 +25,8 @@ function loadEnabledCoins(){
 function updateBadge(p){
 	if(debug) console.log('updateBadge()');
 	var t='';
-	for(let i=0;i<coins.length;i++){
-		if(p[coins[i]]) t+=coins[i].toUpperCase()+': '+p[coins[i]]+(stars.indexOf(coins[i])!=-1?' *':'')+'\n';
-	}
-	if(stars.length!==0) t+='* Recently enabled\nWait for refresh\n';
+	for(let i=0;i<coins.length;i++) if(p[coins[i]]) t+=coins[i].toUpperCase()+': '+p[coins[i]]+(fresh.indexOf(coins[i])==-1?' *':'')+'\n';
+	if(t.indexOf(' *')!==-1) t+='* Recently enabled\nWait for refresh\n';
 	chrome.browserAction.setTitle({title:t});
 	var bcol=localStorage.getItem('bcol');
 	if(!bcol || !/[a-f\d]{6}/i.test(bcol)) bcol=228822;
@@ -43,8 +41,8 @@ function update(refresh){
 	if(!apikey) return needKeyBadge();
 	loadEnabledCoins();
 	getAllCoins(a=>{
-		if(a=='updated'){ stars=[]; fresh='all'; chrome.runtime.sendMessage({stars:stars,fresh:fresh}); processData(); }
-		else if(refresh) getQuotes(a=>{ stars=[]; fresh=coins; chrome.runtime.sendMessage({stars:stars,fresh:fresh}); if(a!='invalidkey') processData(); }); else processData();
+		if(a=='updated'){ fresh='all'; processData(); }
+		else if(refresh) getQuotes(a=>{ fresh=coins; if(a!='invalidkey') processData(); }); else processData();
 	});
 }
 

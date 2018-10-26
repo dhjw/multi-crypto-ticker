@@ -62,26 +62,15 @@ function desel(){
 }
 
 function saveCoins(){
+	if(debug) console.log('saveCoins()');
+	var e=[];
+	for(let i=0;i<tmp_coins.length;i++) if(document.getElementById(tmp_coins[i][0]).checked) e.push(tmp_coins[i][0]);
+	if(debug) console.log('setting enabled_coins e=',e);
+	localStorage.setItem('enabled_coins',JSON.stringify(e));
 	chrome.runtime.sendMessage({pollFresh:1},r=>{
 		fresh=r;
-		if(debug) console.log('saveCoins() fresh=',fresh);
-		var e=[];
-		for(let i=0;i<tmp_coins.length;i++){
-			if(document.getElementById(tmp_coins[i][0]).checked){
-				e.push(tmp_coins[i][0]);
-				if(coins.indexOf(tmp_coins[i][0])==-1 && fresh.indexOf(tmp_coins[i][0])==-1 && fresh!='all') stars.push(tmp_coins[i][0]);
-			} else {
-				if(stars.indexOf(tmp_coins[i][0])!==-1){
-					stars.splice(stars.indexOf(tmp_coins[i][0]),1);
-				}
-			}
-		}
-		chrome.runtime.sendMessage({stars:stars});
-		if(debug) console.log('setting enabled_coins e=',e);
-		localStorage.setItem('enabled_coins',JSON.stringify(e));
 		update();
 	});
-
 }
 
 function saveFreq(){
@@ -131,10 +120,3 @@ function remKey(){
 		location.reload();
 	}
 }
-
-// listen
-chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
-	if(debug) console.log('got message=',message);
-	if(message.stars) stars=message.stars;
-	if(message.fresh) fresh=message.fresh;
-});
