@@ -1,30 +1,18 @@
-var debug='', all_coins=[], coins=[];
+var debug='', apikey, all_coins=[], coins=[];
 
 BigNumber.config({ ROUNDING_MODE:1 });
 
-// multi sync ajax https://stackoverflow.com/a/34570288
-function requestsAreComplete(requests) {
-    return requests.every(function (request) {
-        return request.readyState == 4;
-    });
-}
-
-function unsuccessfulRequests(requests) {
-    var unsuccessful = requests.filter(function (request) {
-         return request.status != 200;
-    });
-    return unsuccessful.length ? unsuccessful : null;
-}
-
-function onRequestsComplete(requests, callback) {
-    function sharedCallback() {
-        if (requestsAreComplete(requests)) {
-            callback(requests, unsuccessfulRequests(requests));
-        }
-    }
-    requests.forEach(function (request) {
-        request.onreadystatechange = sharedCallback;
-    });
+function cmpVersions(a,b){ // https://stackoverflow.com/a/16187766
+	var i,diff;
+	var regExStrip0=/(\.0+)+$/;
+	var segmentsA=a.replace(regExStrip0,'').split('.');
+	var segmentsB=b.replace(regExStrip0,'').split('.');
+	var l=Math.min(segmentsA.length,segmentsB.length);
+	for (i=0;i<l;i++){
+		diff=parseInt(segmentsA[i],10)-parseInt(segmentsB[i],10);
+		if(diff) return diff;
+	}
+	return segmentsA.length-segmentsB.length;
 }
 
 function loadEnabledCoins(){
@@ -48,54 +36,49 @@ function updateBadge(p){
 
 function update(refresh){
 	if(debug) console.log('update()');
+	apikey=localStorage.getItem('apikey');
+	if(!apikey) return needKeyBadge();
 	loadEnabledCoins();
 	if(refresh) getData(()=>{ processData(); }); else processData();
 }
 
 function getData(callback){
 	if(debug) console.log('getData()');
-	var num=localStorage.getItem('num');
-	if(!num) num=100;
-	var pages=Math.round(num/100);
-	if(debug) console.log('num='+num+' pages='+pages);
-	var xs=[];
-	for(let i=1;i<=pages;i++){
-		if(i===pages && (i*100)-num>0) var limit=50; else var limit=100;
-		var x=new XMLHttpRequest();
-		x.timeout=15000;
-		x.open('GET','https://api.coinmarketcap.com/v2/ticker/?start='+((i*100)-99)+'&limit='+limit);
-		xs.push(x);
-	}
-	onRequestsComplete(xs,function(xr,xerr){
-		for(let i=0;i<xs.length;i++){
-			if(xs[i].status!==200){
-				console.log('api error ['+i+'] xs=',xs);
-				var t='Error, this should be temporary';
-				if(xs[i].status===429) t+='\n(429) Rate limit exceeded';
-				chrome.browserAction.setTitle({title:t});
+	var x=new XMLHttpRequest();
+	x.timeout=15000;
+	x.open('GET','https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?CMC_PRO_API_KEY='+apikey);
+	x.onreadystatechange=function(){
+		if(this.readyState==4){
+			if(this.status==200){
+				if(debug) console.log('x=',x);
+				var r={data:{}}
+				try { var y=JSON.parse(x.responseText); } catch(e){}
+				if(!y) return;
+				for(var j in y.data) r.data[j]=y.data[j];
+				if(debug) console.log('r=',r);
+				var done=[]; all_coins=[];
+				for(var i in r.data){
+					if(done.indexOf(r.data[i].id)!==-1) continue;
+					done.push(r.data[i].id);
+					all_coins.push([r.data[i].symbol,parseFloat(r.data[i].quote.USD.price),r.data[i].name]);
+				}
+				all_coins.sort(sort2D);
+				return callback();
+			} else if(this.status==401){ // invalid key
+				localStorage.removeItem('apikey');
+				apikey='';
+				needKeyBadge();
+				return callback();
+			} else {
+				console.log('api error ['+i+'] x=',x);
+				chrome.browserAction.setTitle({title:'API error, this should be temporary'});
 				chrome.browserAction.setBadgeBackgroundColor({color:'#AA0000'});
 				chrome.browserAction.setBadgeText({text:'!'});
 				return;
 			}
 		}
-		if(debug) console.log('xs=',xs);
-		var r={data:{}}
-		for(let i=0;i<xs.length;i++){
-			try { var x=JSON.parse(xs[i].responseText); } catch(e){}
-			if(!x) return;
-			for(var j in x.data) r.data[j]=x.data[j];
-		}
-		if(debug) console.log('r=',r);
-		var done=[]; all_coins=[];
-		for(var i in r.data){
-			if(done.indexOf(r.data[i].id)!==-1) continue;
-			done.push(r.data[i].id);
-			all_coins.push([r.data[i].symbol,parseFloat(r.data[i].quotes.USD.price),r.data[i].name]);
-		}
-		all_coins.sort(sort2D);
-		return callback();
-	});
-	for(let i=0;i<xs.length;i++) xs[i].send();
+	}
+	x.send();
 }
 
 function processData(){
@@ -159,6 +142,14 @@ function processData(){
 	if(debug) console.log('p=',p);
 	localStorage.setItem('response',JSON.stringify(p));
 	updateBadge(p);
+}
+
+function needKeyBadge(){
+	if(debug) console.log('no api key');
+	chrome.browserAction.setIcon({path:'img/default.png'});
+	chrome.browserAction.setTitle({title:'API Key required. Click to open Options.'});
+	chrome.browserAction.setBadgeBackgroundColor({color:'#AA0000'});
+	chrome.browserAction.setBadgeText({text:'!'});
 }
 
 function makeIcon(t){

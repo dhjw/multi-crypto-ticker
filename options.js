@@ -1,45 +1,48 @@
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',afterDOMLoaded); else afterDOMLoaded();
 function afterDOMLoaded(){
+	apikey=localStorage.getItem('apikey');
+	if(!apikey){
+		needKeyBadge();
+		document.body.innerHTML+='<h2>API Key</h2>Get a free API key from CoinMarketCap <a target="_blank" href="https://pro.coinmarketcap.com/">here</a> and enter it below:<br><input type="text" id="apikey" size="32"> <input type="button" id="savekey" value="Save"><br>';
+		document.getElementById('apikey').focus();
+		document.getElementById('savekey').addEventListener('click',()=>{ saveKey(); });
+		window.addEventListener('focus',function(){
+			document.getElementById('apikey').focus();
+		});
+		return;
+	}
 	loadEnabledCoins();
-	var num=localStorage.getItem('num');
-	if(!num) num=100;
-	if(num>100) document.body.innerHTML+='<div id="loading">Loading...</div>';
 	getData(()=>{
+		if(!apikey){ alert('Invalid API key.'); return location.reload(); }
 		processData();
-		if(num>100) document.getElementById('loading').style.display='none';
 		if(all_coins.length>0){
-			var html='<div id="note">(From Top <select id="num">'; for(let i=100;i<=500;i+=50) html+='<option value="'+i+'"'+(num==i?' selected':'')+'>'+i; html+='</select> at <a target="_blank" href="https://coinmarketcap.com">CoinMarketCap</a>)</div>\n<div id="cols"></div>\n';
+			var html='<h2>Enabled Coins</h2><div id="note">(From Top 100 at <a target="_blank" href="https://coinmarketcap.com">CoinMarketCap</a>)</div>\n<div id="cols"></div>\n';
 			document.body.innerHTML+=html;
 			for(let i=0;i<all_coins.length;i++) document.getElementById('cols').innerHTML+='<input type="checkbox" id="'+all_coins[i][0]+'"'+(coins.indexOf(all_coins[i][0])!==-1?' checked':'')+'>'+all_coins[i][0]+(all_coins[i][2].toLowerCase()!==all_coins[i][0].toLowerCase()?' - '+all_coins[i][2]:'')+'<br>';
-			document.body.innerHTML+='<div id="selects"><a id="unsel" href="javascript:;">Unselect All</a></div>';
+			document.body.innerHTML+='<div id="selects"><a id="unsel" href="#">Unselect All</a></div>';
 		} else {
 			document.body.innerHTML+='<div id="note">Error getting coins from API, this should be temporary</div>';
 		}
 		// update frequency
 		var freq=localStorage.getItem('freq');
 		if(!freq) freq=3;
-		var html='<h2>Update Frequency</h2>Every <select id="freq">'; for(let i=1;i<=15;i++) html+='<option value="'+i+'"'+(freq==i?' selected':'')+'>'+i; html+='</select> minutes';
+		var html='<h2>Update Frequency</h2>Every <select id="freq">'; for(let i=5;i<=15;i++) html+='<option value="'+i+'"'+(freq==i?' selected':'')+'>'+i; html+='</select> minutes';
 		document.body.innerHTML+=html;
 		// badge colour
 		var bcol=localStorage.getItem('bcol');
 		if(!bcol || !/[a-f\d]{6}/i.test(bcol)) bcol=228822;
 		document.body.innerHTML+='<h2>Badge Color</h2>#<input type="text" id="bcol" size="6" value="'+bcol+'"> <a target="_blank" href="https://htmlcolorcodes.com/color-chart/">Chart</a><br><br>';
+		document.body.innerHTML+='<a id="remkey" class="r" href="#">Remove API Key</a><br>';
 		// events
 		if(all_coins.length>0){
-			document.getElementById('num').addEventListener('change',()=>{ saveNum(); });
 			for(let i=0;i<all_coins.length;i++) document.getElementById(all_coins[i][0]).addEventListener('click',()=>{ saveCoins(); });
-			document.getElementById('unsel').addEventListener('click',function(){ desel(); });
+			document.getElementById('unsel').addEventListener('click',e=>{ e.preventDefault(); desel(); });
 		}
 		document.getElementById('freq').addEventListener('change',()=>{ saveFreq(); });
 		document.getElementById('bcol').addEventListener('keyup',()=>{ changeBcol(); });
 		document.getElementById('bcol').addEventListener('change',()=>{ changeBcol(); });
+		document.getElementById('remkey').addEventListener('click',e=>{ e.preventDefault(); remKey(); });
 	});
-}
-
-function saveNum(){
-	if(debug) console.log('saveNum()');
-	localStorage.setItem('num',document.getElementById('num').value);
-	location.reload();
 }
 
 function desel(){
@@ -73,4 +76,18 @@ function changeBcol(){
 	}
 	chrome.browserAction.setBadgeBackgroundColor({color:'#'+bcol});
 	localStorage.setItem('bcol',bcol);
+}
+
+function saveKey(){
+	localStorage.setItem('apikey',document.getElementById('apikey').value.trim());
+	apikey=document.getElementById('apikey').value.trim();
+	location.reload();
+}
+
+function remKey(){
+	if(confirm('Are you sure you want to remove your API key?\nUpdates won\'t work until you add another.')){
+		localStorage.removeItem('apikey');
+		apikey='';
+		location.reload();
+	}
 }

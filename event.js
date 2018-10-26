@@ -1,7 +1,16 @@
+
+chrome.runtime.onInstalled.addListener(function(details){
+	if(cmpVersions(details.previousVersion,'1.0.9')<0){
+		localStorage.removeItem('num');
+		var freq=localStorage.getItem('freq');
+		if(!freq || freq<5) localStorage.setItem('freq',5);
+	}
+});
+
 chrome.alarms.get('update',a=>{
 	if(debug) console.log('alarm update a=',a);
 	var freq=localStorage.getItem('freq');
-	if(!freq) freq=3;
+	if(!freq || freq<5) freq=5;
 	if(!a || (a && a.periodInMinutes!=freq)){
 		if(debug) console.log('alarm not set or period != '+freq+', setting');
 		chrome.alarms.clear('update');
@@ -30,6 +39,12 @@ chrome.contextMenus.onClicked.addListener((info,tab)=>{
 // on icon click set next coin as current and update badge with stored data
 chrome.browserAction.onClicked.addListener(()=>{
 	if(debug) console.log('clicked');
+	apikey=localStorage.getItem('apikey');
+	if(!apikey){
+		needKeyBadge();
+		chrome.runtime.openOptionsPage(()=>{});
+		return;
+	}
 	loadEnabledCoins();
 	var current=localStorage.getItem('current');
 	current_i=coins.indexOf(current);

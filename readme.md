@@ -1,5 +1,5 @@
 ## Multi Crypto Ticker (Chrome Extension)
-Watch multiple cryptocurrency prices from your browser toolbar. Choose from the top 500 coins on CoinMarketCap.
+Watch multiple cryptocurrency prices from your browser toolbar. Choose from the top 100 coins on CoinMarketCap.
 
 ### Install
 - [Get it on the Chrome web store](https://chrome.google.com/webstore/detail/mckpoliiiknakdcaoabkkdbbenopnabl)
@@ -16,7 +16,8 @@ Watch multiple cryptocurrency prices from your browser toolbar. Choose from the 
 - Hover over icon to view all enabled coin prices
 - Right click icon to access options (customize coins, update frequency and icon badge background color)
 
-All prices are obtained from the public CoinMarketCap API
+### API Limits
+All prices are obtained via the CoinMarketCap API. As of late 2018 a [free API key](https://pro.coinmarketcap.com/) is required. The request limit on the free Basic plan is 333/day, so it is recommended to get a separate API key for each computer that stays online with the browser open to allow updating prices every 5 minutes. Alternately, for two computers you can set the update frequency to every 9 minutes, or on three computers every 14 minutes, to stay within the Basic plan limits.
 
 ### Donations
 BTC: 3LMSJ7w12Fj8VnN9ZBGDVVc1RJxR6dAWpn ([QR code](http://chart.apis.google.com/chart?chs=300x300&cht=qr&choe=ISO-8859-1&chl=3LMSJ7w12Fj8VnN9ZBGDVVc1RJxR6dAWpn))\
