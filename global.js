@@ -151,6 +151,8 @@ function processData(){
 			if(a.toFixed(4)<=0.9999){ // 4 decimals, no leading or trailing 0
 				var d=5, b=+a.toFixed(4);
 				b=b.toString().substr(1);
+			} else if(a.toFixed(3)<=9.999){ // 3 decimals
+				var d=4, b=+a.toFixed(3);
 			} else if(a.toFixed(2)<=99.99){ // 2 decimals
 				var b=a.toFixed(2);
 			} else if(a.toFixed(1)<=999.9){ // 1 decimal
@@ -172,7 +174,7 @@ function processData(){
 				var d=5, b=+a.toFixed(3);
 				b=b.toString().substr(1);
 			} else if(a.toFixed(2)<=9.99){ // 2 decimals
-				var b=a.toFixed(2);
+				var d=4, b=a.toFixed(2);
 			} else if(a.toFixed(1)<=99.9){ // 1 decimal
 				var b=a.toFixed(1);
 			} else if(a.toFixed(0)<=9999){ // no decimals
