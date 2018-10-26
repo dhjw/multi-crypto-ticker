@@ -1,7 +1,6 @@
 
 chrome.runtime.onInstalled.addListener(function(details){
 	if(cmpVersions(details.previousVersion,'1.0.9')<0){
-		localStorage.removeItem('num');
 		var freq=localStorage.getItem('freq');
 		if(!freq || freq<5) localStorage.setItem('freq',5);
 	}
@@ -36,13 +35,25 @@ chrome.contextMenus.onClicked.addListener((info,tab)=>{
 	}
 });
 
+// listen
+chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
+	if(message.stars) stars=message.stars;
+	if(message.pollFresh) sendResponse(fresh);
+});
+
 // on icon click set next coin as current and update badge with stored data
 chrome.browserAction.onClicked.addListener(()=>{
 	if(debug) console.log('clicked');
 	apikey=localStorage.getItem('apikey');
 	if(!apikey){
 		needKeyBadge();
-		chrome.runtime.openOptionsPage(()=>{});
+		chrome.runtime.openOptionsPage(()=>{
+			for(let i=0;i<chrome.extension.getViews().length;i++){
+				if(chrome.extension.getViews()[i].location.href.indexOf('options.html')!==-1){
+					chrome.extension.getViews()[i].location.reload();
+				}
+			}
+		});
 		return;
 	}
 	loadEnabledCoins();
