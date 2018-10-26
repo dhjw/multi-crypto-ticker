@@ -39,11 +39,6 @@ chrome.contextMenus.onClicked.addListener((info,tab)=>{
 	}
 });
 
-// listen
-chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
-	if(message.pollFresh) sendResponse(fresh);
-});
-
 // on icon click set next coin as current and update badge with stored data
 chrome.browserAction.onClicked.addListener(()=>{
 	if(debug) console.log('clicked');

@@ -1,4 +1,4 @@
-var debug, sandbox, apikey, all_coins=[], coins=[], fresh=[];
+var debug, sandbox, apikey, all_coins=[], coins=[];
 
 BigNumber.config({ ROUNDING_MODE:1 });
 
@@ -24,8 +24,10 @@ function loadEnabledCoins(){
 
 function updateBadge(p){
 	if(debug) console.log('updateBadge()');
+	fresh=localStorage.getItem('fresh');
+	try { fresh=JSON.parse(fresh); } catch(e){ }
 	var t='';
-	for(let i=0;i<coins.length;i++) if(p[coins[i]]) t+=coins[i].toUpperCase()+': '+p[coins[i]]+(fresh.indexOf(coins[i])==-1?' *':'')+'\n';
+	for(let i=0;i<coins.length;i++) if(p[coins[i]]) t+=coins[i].toUpperCase()+': '+p[coins[i]]+(!fresh||(fresh!='all'&&fresh.indexOf(coins[i])==-1)?' *':'')+'\n';
 	if(t.indexOf(' *')!==-1) t+='* Recently enabled\nWait for refresh\n';
 	chrome.browserAction.setTitle({title:t});
 	var bcol=localStorage.getItem('bcol');
@@ -41,8 +43,16 @@ function update(refresh){
 	if(!apikey) return needKeyBadge();
 	loadEnabledCoins();
 	getAllCoins(a=>{
-		if(a=='updated'){ fresh='all'; processData(); }
-		else if(refresh) getQuotes(a=>{ fresh=coins; if(a!='invalidkey') processData(); }); else processData();
+		if(a=='updated'){
+			localStorage.setItem('fresh',JSON.stringify('all'));
+			processData();
+		} else if(a=='invalidkey') return;
+		else if(refresh) getQuotes(a=>{
+				if(a=='invalidkey') return;
+				localStorage.setItem('fresh',JSON.stringify(coins));
+				processData();
+			});
+		else processData();
 	});
 }
 

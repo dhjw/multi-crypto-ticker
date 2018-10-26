@@ -67,10 +67,7 @@ function saveCoins(){
 	for(let i=0;i<tmp_coins.length;i++) if(document.getElementById(tmp_coins[i][0]).checked) e.push(tmp_coins[i][0]);
 	if(debug) console.log('setting enabled_coins e=',e);
 	localStorage.setItem('enabled_coins',JSON.stringify(e));
-	chrome.runtime.sendMessage({pollFresh:1},r=>{
-		fresh=r;
-		update();
-	});
+	update();
 }
 
 function saveFreq(){
@@ -102,10 +99,23 @@ function saveKey(){
 	localStorage.setItem('apikey',apikey);
 	loadEnabledCoins();
 	getAllCoins(a=>{
-		if(a=='updated'){ processData(); location.reload(); }
-		else if(a=='invalidkey'){ alert('Invalid API key.'); document.getElementById('apikey').value=''; document.getElementById('apikey').focus(); return; }
-		else getQuotes(a=>{
-			if(a=='invalidkey'){ alert('Invalid API key.'); document.getElementById('apikey').value=''; document.getElementById('apikey').focus(); return; }
+		if(a=='updated'){
+			localStorage.setItem('fresh',JSON.stringify('all'));
+			processData();
+			location.reload();
+		} else if(a=='invalidkey'){
+			alert('Invalid API key.');
+			document.getElementById('apikey').value='';
+			document.getElementById('apikey').focus();
+			return;
+		} else getQuotes(a=>{
+			if(a=='invalidkey'){
+				alert('Invalid API key.');
+				document.getElementById('apikey').value='';
+				document.getElementById('apikey').focus();
+				return;
+			}
+			localStorage.setItem('fresh',JSON.stringify(coins));
 			processData();
 			location.reload();
 		});
