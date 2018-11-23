@@ -2,7 +2,7 @@
 Watch multiple cryptocurrency prices from your browser toolbar. Choose from the top 1000 coins on CoinMarketCap.
 
 ### Install
-- [Get it on the Chrome web store](https://chrome.google.com/webstore/detail/mckpoliiiknakdcaoabkkdbbenopnabl)
+- ~~Get it on the Chrome web store~~ New API requirements violate Chrome web store TOS :(
 
 #### or
 - Clone this repository. `git clone https://github.com/dhjw/multi-crypto-ticker`
