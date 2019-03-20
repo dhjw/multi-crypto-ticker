@@ -20,8 +20,7 @@ Watch multiple cryptocurrency prices from your browser toolbar. Choose from the 
 All prices are obtained via the CoinMarketCap API. As of late 2018 a [free API key](https://pro.coinmarketcap.com/) is required. The request limit on the free Basic plan is 333/day, so it is recommended to get a separate API key for each computer that stays online with the browser open to allow updating prices every 5 minutes. Alternately, for two computers you can set the update frequency to every 10 minutes, or on three computers every 15 minutes, to stay within the Basic plan limits using a single API key.
 
 ### Donations
-BTC: 3LMSJ7w12Fj8VnN9ZBGDVVc1RJxR6dAWpn ([QR code](http://chart.apis.google.com/chart?chs=300x300&cht=qr&choe=ISO-8859-1&chl=3LMSJ7w12Fj8VnN9ZBGDVVc1RJxR6dAWpn))\
-BCH: qpsh5g2f9wk3tjwkl9yhqnw7rhwwuy38dywm7xxcra ([QR code](http://chart.apis.google.com/chart?chs=300x300&cht=qr&choe=ISO-8859-1&chl=bitcoincash:qpsh5g2f9wk3tjwkl9yhqnw7rhwwuy38dywm7xxcra))\
-ETH: 1207970a46a7a76715cd1bd9926ba358822338ed ([QR code](http://chart.apis.google.com/chart?chs=300x300&cht=qr&choe=ISO-8859-1&chl=1207970a46a7a76715cd1bd9926ba358822338ed))
+BTC: 15feTADYWHcRmVHiSWeqP7M3R6GmmARNnv   
+ETH: 0x9eedb4ecf70ac12b3715123f0dde0594ba24a445 
 
 Thank you!
